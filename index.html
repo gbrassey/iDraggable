@@ -1,0 +1,48 @@
+<!DOCTYPE HTML> 
+<html>
+<head>
+	<title>Dragger</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=8">
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/> 
+	<meta name="apple-mobile-web-app-capable" content="yes" /> 
+    <style type="text/css">
+    .draggable, .droppable {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        color: #FFF;
+        text-align: center;
+        background-color: #ABF;
+        border: 3px solid #669;
+    }
+    .draggables { float: left; }
+    .draggable { background-color: red; }
+    .droppables { float: right; }
+    .droppable { background-color: green; }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="draggables">
+    	<div class="draggable" id="dragItemA">A</div>
+        <div class="draggable" id="dragItemB">B</div>
+        <div class="draggable" id="dragItemC">C</div>
+    </div>
+    <div class="droppables">
+        <div class="droppable" id="dropItemA">A</div>
+        <div class="droppable" id="dropItemB">B</div>
+        <div class="droppable" id="dropItemC">C</div>
+    </div>
+</div>
+
+<script src="jquery.js"></script>
+<script src="iDraggable.js"></script>
+<script>
+$(document).ready(function() {
+  $(".draggable").iDraggable();
+  $(".droppable").iDroppable();
+});
+</script>
+</body>
+</html>
