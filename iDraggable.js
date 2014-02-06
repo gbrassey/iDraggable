@@ -1,6 +1,7 @@
 var dragInput = new Object();
 
 $.fn.iDraggable = function() {
+  console.log('init');
 	$(this).each(function() {
     var offset = null;
     var origOffset = $(this).offset();
@@ -17,26 +18,28 @@ $.fn.iDraggable = function() {
     var start = function(e) {
       e.preventDefault();
     	e.stopPropagation();
-    	var orig = e.originalEvent;
+    	var orig = (e.type === "mousedown") ? e.originalEvent : e.originalEvent.changedTouches[0];
    		var startOffset = $(this).offset();
-    	offset = {
-      	x: orig.changedTouches[0].pageX - startOffset.left,
-       	y: orig.changedTouches[0].pageY - startOffset.top
-    	};
+      offset = {
+        x: orig.pageX - startOffset.left,
+        y: orig.pageY - startOffset.top
+      };
     	isActive = !$(this).hasClass('incorrect') && !$(this).hasClass('correct');
     	if (isActive && dragInput[$(this).attr('id').toString()]) {
       	$('#' + dragInput[$(this).attr('id').toString()]).removeClass('iD-disabled');
 		  	delete dragInput[$(this).attr('id').toString()];
     	}
+      $(this).bind("touchmove mousemove", moveMe);
+      $(this).bind("touchend mouseup", dropMe);
     };
     var moveMe = function(e) {
     	e.preventDefault();
     	e.stopPropagation();
-    	var orig = e.originalEvent;
-    	var newOffset = {
-    		x: orig.changedTouches[0].pageX - offset.x - origPos.left,
-    		y: orig.changedTouches[0].pageY - offset.y - origPos.top
-    	}
+      var orig = (e.type === "mousemove") ? e.originalEvent : e.originalEvent.changedTouches[0];
+      var newOffset = {
+        x: orig.pageX - offset.x - origPos.left,
+        y: orig.pageY - offset.y - origPos.top
+      };
     	if (isActive) {
       	$(this).css({ 
       		'transform': 'translate(' + newOffset.x + 'px, ' + newOffset.y + 'px) translatez(0)',
@@ -45,11 +48,11 @@ $.fn.iDraggable = function() {
     	}
     };
     var dropMe = function(e) {
-    	var orig = e.originalEvent;
-    	var finger = {
-    		x: orig.changedTouches[0].pageX,
-    		y: orig.changedTouches[0].pageY
-    	};
+      var orig = (e.type === "mouseup") ? e.originalEvent : e.originalEvent.changedTouches[0];
+      var finger = {
+        x: orig.pageX,
+        y: orig.pageY
+      };
     	var $drag = $(this);
     	var offset = $drag.offset();
     	var dropped = false;
@@ -74,10 +77,11 @@ $.fn.iDraggable = function() {
   				'transform': 'translate(0px, 0px) translatez(0)'
   			});
   		}
+      $(this).unbind("touchmove mousemove", moveMe);
+      $(this).unbind("touchend mouseup", dropMe);
     };
-    $(this).bind("touchstart", start);
-    $(this).bind("touchmove", moveMe);
-    $(this).bind("touchend", dropMe);
+    $(this).bind("touchstart mousedown", start);
+    $(window).bind("resize", function() { console.log('resized'); });
   });
 };
 
