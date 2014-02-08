@@ -1,7 +1,6 @@
 var dragInput = new Object();
 
 $.fn.iDraggable = function() {
-  console.log('init');
 	$(this).each(function() {
     var offset = null;
     var origOffset = $(this).offset();
@@ -65,7 +64,7 @@ $.fn.iDraggable = function() {
   					y: box.top - origPos.top
   				};
   				$drag.css({ 
-  					'transform': 'translate(' + (box.left - origPos.left) + 'px, ' + (box.top - origPos.top) + 'px) translatez(0)' 
+  					'transform': 'translate(' + offset.x + 'px, ' + offset.y + 'px) translatez(0)' 
   				});
   				$(this).addClass('iD-disabled');
   				dragInput[$drag.attr('id').toString()] = $(this).attr('id');
@@ -79,9 +78,24 @@ $.fn.iDraggable = function() {
   		}
       $(this).unbind("touchmove mousemove", moveMe);
       $(this).unbind("touchend mouseup", dropMe);
+      var _this = this;
+      $(window).bind("resize", function() { 
+        resize(_this);
+      });
+    };
+    var resize = function(drag) {
+      if (dragInput[$(drag).attr('id').toString()]) {
+        var box = $("#" + dragInput[$(drag).attr('id').toString()]).data();
+        var offset = {
+          x: box.left - origPos.left,
+          y: box.top - origPos.top
+        };
+        $(drag).css({ 
+          'transform': 'translate(' + offset.x + 'px, ' + offset.y + 'px) translatez(0)' 
+        });
+      }
     };
     $(this).bind("touchstart mousedown", start);
-    $(window).bind("resize", function() { console.log('resized'); });
   });
 };
 
@@ -97,5 +111,7 @@ $.fn.iDroppable = function() {
   	for (var key in coords) {
     	$(this).data(key, coords[key]);
     }
+    var _this = this;
+    $(window).bind("resize", function() { $(_this).iDroppable(); });
 	});
 };
