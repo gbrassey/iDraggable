@@ -110,7 +110,7 @@
     		top: offset.top,
     		right: offset.left + $(this).width(),
     		bottom: offset.top + $(this).height()
-    	}
+    	};
     	for (var key in coords) {
       	$(this).data(key, coords[key]);
       }
