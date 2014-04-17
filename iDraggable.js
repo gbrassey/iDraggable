@@ -78,7 +78,14 @@
     				'transform': 'translate(0px, 0px) translatez(0)'
     			}).removeClass(options.droppedClass);
     		} else if (!droppedInto) {
-          $(this).removeClass(options.droppedClass);
+          var matrix = new WebKitCSSMatrix($(this).css('transform'));
+          var transform = {       // transform incase drags are initialized while dropped
+            left: matrix.m41,
+            top: matrix.m42
+          };
+          $(this).css({
+            'transform': 'translate(' + transform.left + 'px, ' + transform.top + 'px) translatez(0)'
+          }).removeClass(options.droppedClass);
         }
         if (options.drop) {
           options.drop({ draggable: this, droppable: droppedInto });
