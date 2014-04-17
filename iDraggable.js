@@ -1,13 +1,17 @@
 (function($) {
 
-  var dragInput = new Object();
 
-  $.fn.iDraggable = function() {
+  $.fn.iDraggable = function(options) {
+    
+    var options = $.extend({
+      droppedClass: 'iD-dropped',
+      revert: true
+    }, options);
+
   	return this.each(function() {
       $(this).addClass('iDraggable');
       var offset = null;
       var origOffset = $(this).offset();
-      var isActive = true;
       var matrix = new WebKitCSSMatrix($(this).css('transform'));
       var transform = {				// transform incase drags are initialized while dropped
       	left: matrix.m41,
@@ -26,11 +30,6 @@
           x: orig.pageX - startOffset.left,
           y: orig.pageY - startOffset.top
         };
-      	isActive = !$(this).hasClass('incorrect') && !$(this).hasClass('correct');
-      	if (isActive && dragInput[$(this).attr('id').toString()]) {
-        	$('#' + dragInput[$(this).attr('id').toString()]).removeClass('iD-dropped');
-  		  	delete dragInput[$(this).attr('id').toString()];
-      	}
         $(this).bind("touchmove mousemove", moveMe);
         $(this).bind("touchend mouseup", dropMe);
       };
@@ -42,11 +41,9 @@
           x: orig.pageX - offset.x - origPos.left,
           y: orig.pageY - offset.y - origPos.top
         };
-      	if (isActive) {
-        	$(this).css({ 
-        		'transform': 'translate(' + newOffset.x + 'px, ' + newOffset.y + 'px) translatez(1px)'
-        	});
-      	}
+      	$(this).css({ 
+      		'transform': 'translate(' + newOffset.x + 'px, ' + newOffset.y + 'px) translatez(1px)'
+      	});
       };
       var dropMe = function(e) {
         var orig = (e.type === "mouseup") ? e.originalEvent : e.originalEvent.changedTouches[0];
@@ -56,28 +53,36 @@
         };
       	var $drag = $(this);
       	var offset = $drag.offset();
-      	var dropped = false;
+      	var droppedInto = null;
     		$('.iDroppable').each(function() {
     			var box = $(this).data().box;
-    			var dropActive = !$(this).hasClass('iD-dropped');
+    			var dropActive = !$(this).hasClass(options.droppedClass);
     			if (dropActive && (box.left <= finger.x) && (finger.x <= box.right) && (box.top <= finger.y) && (finger.y <= box.bottom)) {
+            droppedInto = this;
     				var offset = {
     					x: box.left - origPos.left,
     					y: box.top - origPos.top
     				};
+            $(droppedInto).addClass(options.droppedClass);
     				$drag.css({ 
     					'transform': 'translate(' + offset.x + 'px, ' + offset.y + 'px) translatez(0)' 
-    				}).addClass('iD-dropped');
-    				$(this).addClass('iD-dropped');
-    				dragInput[$drag.attr('id').toString()] = $(this).attr('id');
-    				dropped = true;
+    				})
+            .addClass(options.droppedClass)
+            .one("touchstart mousedown", function(e) {
+              $(droppedInto).removeClass(options.droppedClass);
+            });
     			}
     		});
-    		if (!dropped && isActive) {
+    		if (!droppedInto && options.revert) {
     			$(this).css({ 
     				'transform': 'translate(0px, 0px) translatez(0)'
-    			}).removeClass('iD-dropped');
-    		}
+    			}).removeClass(options.droppedClass);
+    		} else if (!droppedInto) {
+          $(this).removeClass(options.droppedClass);
+        }
+        if (options.drop) {
+          options.drop({ draggable: this, droppable: droppedInto });
+        }
         $(this).unbind("touchmove mousemove", moveMe);
         $(this).unbind("touchend mouseup", dropMe);
         var _this = this;
@@ -99,7 +104,6 @@
       };
       $(this).bind("touchstart mousedown", start);
     });
-    return this;
   };
 
   $.fn.iDroppable = function() {

@@ -33,13 +33,28 @@
     </div>
 </div>
 
-<script src="jquery.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="iDraggable.js"></script>
 <script>
+
+var dragInput = new Object();
+
+
 $(document).ready(function() {
-  $(".draggable").iDraggable();
+    $(".draggable").iDraggable({ 
+        drop: function(iD) {
+            var draggable = iD.draggable;
+            var droppable = iD.droppable;
+            if (droppable) {
+                dragInput[$(draggable).attr('id').toString()] = $(droppable).attr('id');
+            } else {
+                delete dragInput[$(draggable).attr('id').toString()];
+            }
+        }
+    });
   $(".droppable").iDroppable();
 });
+
 </script>
 </body>
 </html>
