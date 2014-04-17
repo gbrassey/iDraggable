@@ -43,8 +43,7 @@
         };
       	if (isActive) {
         	$(this).css({ 
-        		'transform': 'translate(' + newOffset.x + 'px, ' + newOffset.y + 'px) translatez(0)',
-            'z-index': '2'
+        		'transform': 'translate(' + newOffset.x + 'px, ' + newOffset.y + 'px) translatez(1px)'
         	});
       	}
       };
