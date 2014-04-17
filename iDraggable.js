@@ -4,6 +4,7 @@
 
   $.fn.iDraggable = function() {
   	return this.each(function() {
+      $(this).addClass('iDraggable');
       var offset = null;
       var origOffset = $(this).offset();
       var isActive = true;
@@ -56,8 +57,8 @@
       	var $drag = $(this);
       	var offset = $drag.offset();
       	var dropped = false;
-    		$('.droppable').each(function() {
-    			var box = $(this).data();
+    		$('.iDroppable').each(function() {
+    			var box = $(this).data().box;
     			var dropActive = !$(this).hasClass('iD-dropped');
     			if (dropActive && (box.left <= finger.x) && (finger.x <= box.right) && (box.top <= finger.y) && (finger.y <= box.bottom)) {
     				var offset = {
@@ -104,15 +105,13 @@
   $.fn.iDroppable = function() {
     return this.each(function() {
     	var offset = $(this).offset();
-    	var coords = {
+    	var box = {
     		left: offset.left,
     		top: offset.top,
     		right: offset.left + $(this).width(),
     		bottom: offset.top + $(this).height()
     	};
-    	for (var key in coords) {
-      	$(this).data(key, coords[key]);
-      }
+    	$(this).data('box', box).addClass('iDroppable');
       var _this = this;
       $(window).bind("resize", function() { $(_this).iDroppable(); });
   	});
